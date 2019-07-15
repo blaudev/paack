@@ -1,5 +1,5 @@
-#Paack
-##Descripción
+# Paack
+## Descripción
 Tenemos un archivo de clientes en formato csv. Este archivo es lo suficientemente grande como para no poder cargarse completo en memoria.  
 
 Necesitamos 2 servicios:  
@@ -8,8 +8,8 @@ El primer servicio lee este archivo y actualiza una base de datos postgres con l
 Una vez actualizada la base de datos comunica los cambios al segundo servicio.  
 
 El segundo servicio se encarga de enviar las incorporaciones y modificaciones a un API de un CMS. Esta API se trata de un API REST clásica que no acepta POST ni PUT masivos. Además, esta API falla de forma aleatória.  
-##Resolución
-###Primer servicio: PARSER
+## Resolución
+### Primer servicio: PARSER
 Se encarga de parsear los registros del archivo. Los inserta o actualiza en la base de datos y los enviamos al segundo servicio.  
 
 Estos son los pasos:  
@@ -30,14 +30,14 @@ Los registros devueltos por la base de datos se dividen y se envían al segundo 
 Se utiliza el protocolo RPC para mayor velocidad y seguridad.  
 Se utiliza concurrencia para el envío para conseguir mayor velocidad.  
 
-##Segundo servicio: INTEGRATOR
+## Segundo servicio: INTEGRATOR
 El servicio recibe los registros del **parser** y los envía a la API del CMS.  
 Si el APi falla se repite la operación hasta un máximo de n veces.  
 Si el registro es nuevo se envía un POST, si es una actualización se envía un PUT.  
 Solo se repetirá un envío en caso de error por parte del API.  
   
-##Ejecución
-###Parser
+## Ejecución
+### Parser
 ```
 $ cd ../../apps/parser
 $ go build -o ../../bin/parser
@@ -51,15 +51,15 @@ $ ./parser -r 1000000 -f customers.csv
   
 **-r** indica el número de regsitros que contendrá cada archivo una vez se haya dividido el csv de clientes.    
 
-###Integrator
+### Integrator
 Al tratarse de un servico arranca con docker-compose:
 ```
 $ sudo docker-compose up --build
 ```
 
-##Tools
+## Tools
 Para facilitar el testing se han creado 2 tools y 2 servicios:  
-###Mock
+### Mock
 Crea un archivo de clientes para pruebas  
 ```
 $ cd ../../tools/mock
@@ -72,14 +72,14 @@ $ ./mock -r 1000000 -f customers.csv
 | -r        | número de registros              |
 | -f        | path para el archivo de clientes |
   
-##API, POSTGRES y ADMINER
+## API, POSTGRES y ADMINER
 Api simula el API REST del CMS, fallando de forma random.  
 Postgres y admin para testing de la base de datos.  
 Arrancan con docker-compose.  
 ```
 $ sudo docker-compose up --build
 ```
-#Notas 
+# Notas 
 La cobertura de testing es mínima. La mayoría de testing debería ser de integración, lo cual escapa al objetivo de esta prueba.  
 
 Se ha procurado seguir las convenciones del lenguaje. Por ejemplo, ninguna función ni struct tiene letra capital si no es estrictamente necesario.  
@@ -94,7 +94,7 @@ Los Docker no se han optimizado. Están solo para uso en desarrollo.
 
 Hay varias contántes que se pueden ajustar según requisitos.  
 
-#CONCLUSIÓN
+# CONCLUSIÓN
 El proyecto sirve para probar comunicaciones y concurrencia, pero es una aplicación muy acoplada.
 Si algo falla, falla todo. Además, hay un cuello de botella muy importante en el último paso, cuando **integrator** comunica con el API-CMS.
 Este cuello de botella minimiza la eficacia de todas las concurrencias anteriores.  
