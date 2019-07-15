@@ -1,0 +1,23 @@
+version: '3.7'
+
+services:
+
+  db:
+    image: postgres
+    volumes:
+      - ./conf/entrypoint.sql:/docker-entrypoint-initdb.d/entrypoint.sql
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+    ports:
+      - 5432:5432
+
+  integrator:
+    build:
+      context: ./apps/integrator
+      dockerfile: Dockerfile
+    ports:
+      - 5002:5002
+    depends_on:
+      - db
