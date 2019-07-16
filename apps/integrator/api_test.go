@@ -5,7 +5,7 @@ import (
 )
 
 func Test__api__sendCustomers__ok(t *testing.T) {
-	records := 100115
+	records := 1000115
 
 	cs := make([]Customer, 0, records)
 	for i := 0; i < records; i++ {

@@ -86,21 +86,23 @@ func (a *api) job(c Customer) apiResp {
 		return apiResp{err: err}
 	}
 
-	req, err := http.NewRequest(method, a.url, strings.NewReader(string(data)))
-	if err != nil {
-		return apiResp{err: err}
-	}
-
-	return func() apiResp {
-		for i := 0; i < numOfAttempts; i++ {
-			resp, err := a.client.Do(req)
-			if err != nil || resp.StatusCode != http.StatusOK {
-				continue
-			}
-
-			return apiResp{}
+	for i := 0; i < numOfAttempts; i++ {
+		req, err := http.NewRequest(method, a.url, strings.NewReader(string(data)))
+		if err != nil {
+			continue
 		}
 
-		return apiResp{err: errSendingCustomers}
-	}()
+		resp, err := a.client.Do(req)
+		if err != nil {
+			continue
+		}
+
+		if resp.StatusCode != http.StatusOK {
+			continue
+		}
+
+		return apiResp{}
+	}
+
+	return apiResp{err: errSendingCustomers}
 }
