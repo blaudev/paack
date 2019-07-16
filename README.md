@@ -92,15 +92,4 @@ No se eliminan los registros anteriores (sólo se insertan y actualizan los exis
 
 Los Docker no se han optimizado. Están solo para uso en desarrollo.  
 
-Hay varias contántes que se pueden ajustar según requisitos.  
-
-# CONCLUSIÓN
-El proyecto sirve para probar comunicaciones y concurrencia, pero es una aplicación muy acoplada.
-Si algo falla, falla todo. Además, hay un cuello de botella muy importante en el último paso, cuando **integrator** comunica con el API-CMS.
-Este cuello de botella minimiza la eficacia de todas las concurrencias anteriores.  
-
-No hay tolerancia a errores. Se ha hecho así para evitar complejidad en el ejemplo.
-De todos modos se ha mostrado control de errores en lugares más críticos como son en la concurrencia.  
-
-A día de hoy la arquitectura de esta aplicación carece de sentido. Todos los retos se hubieran solucionado de forma mucho más eficaz, segura y escalable utilizando microservicios.
-Especialmente para solucionar el cuello de botella final. Entiendo que esta prueba no se trataba de microservicios.
+Hay varias constántes que se pueden ajustar según requisitos.  
