@@ -52,7 +52,10 @@ func (in *integrator) sendCustomers(cs []Customer) error {
 	}
 
 	jobs := make(chan []Customer, size)
+	defer close(jobs)
+
 	resp := make(chan integratorResp, size)
+	defer close(resp)
 
 	for i := 0; i < integratorConcurrency; i++ {
 		go in.worker(jobs, resp)

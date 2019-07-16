@@ -50,7 +50,10 @@ func (db *database) saveCustomers(cs []Customer) ([]Customer, error) {
 	}
 
 	jobs := make(chan []Customer, size)
+	defer close(jobs)
+
 	resp := make(chan databaseResp, size)
+	defer close(resp)
 
 	for i := 0; i < databaseConcurrency; i++ {
 		go db.worker(jobs, resp)

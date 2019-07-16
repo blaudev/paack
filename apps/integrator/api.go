@@ -45,7 +45,10 @@ func newApi(url string) *api {
 
 func (a *api) sendCustomers(cs []Customer) error {
 	jobs := make(chan Customer, len(cs))
+	defer close(jobs)
+
 	resp := make(chan apiResp, len(cs))
+	defer close(resp)
 
 	for i := 0; i < apiConcurrency; i++ {
 		go a.worker(jobs, resp)
