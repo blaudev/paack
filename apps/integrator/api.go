@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	apiConcurrency     = 1
-	numOfAttempts      = 20
+	apiConcurrency     = 50
+	numOfAttempts      = 10
 	maxHttpConnections = 1000
 	idleConnTimeout    = time.Second * 60
 )
@@ -45,7 +45,6 @@ func newApi(url string) *api {
 
 func (a *api) sendCustomers(cs []Customer) error {
 	jobs := make(chan Customer, len(cs))
-	defer close(jobs)
 
 	resp := make(chan apiResp, len(cs))
 	defer close(resp)
@@ -57,6 +56,7 @@ func (a *api) sendCustomers(cs []Customer) error {
 	for _, c := range cs {
 		jobs <- c
 	}
+	defer close(jobs)
 
 	for i := 0; i < len(cs); i++ {
 		if r := <-resp; r.err != nil {
@@ -94,9 +94,11 @@ func (a *api) job(c Customer) apiResp {
 	return func() apiResp {
 		for i := 0; i < numOfAttempts; i++ {
 			resp, err := a.client.Do(req)
-			if err == nil && resp.StatusCode == http.StatusOK {
-				return apiResp{}
+			if err != nil || resp.StatusCode != http.StatusOK {
+				continue
 			}
+
+			return apiResp{}
 		}
 
 		return apiResp{err: errSendingCustomers}
