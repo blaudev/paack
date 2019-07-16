@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	integratorConcurrency     = 100
+	integratorConcurrency     = 1
 	integratorRecordsPerCycle = 10000
 	integratorHost            = "localhost:5002"
 	integratorProcessFuncName = "Service.Process"
@@ -46,7 +46,12 @@ func (in *integrator) dial() error {
 }
 
 func (in *integrator) sendCustomers(cs []Customer) error {
-	size := len(cs) / integratorRecordsPerCycle
+	recs := integratorRecordsPerCycle
+	if len(cs) < recs {
+		recs = len(cs)
+	}
+
+	size := len(cs) / recs
 	if len(cs)%size != 0 {
 		size++
 	}
@@ -62,9 +67,9 @@ func (in *integrator) sendCustomers(cs []Customer) error {
 	}
 
 	for i := 0; i < size; i++ {
-		cst := cs[i*integratorRecordsPerCycle : (i+1)*integratorRecordsPerCycle]
+		cst := cs[i*recs : (i+1)*recs]
 		if i+1 == size {
-			cst = cs[i*integratorRecordsPerCycle:]
+			cst = cs[i*recs:]
 		}
 
 		jobs <- cst

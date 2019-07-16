@@ -44,7 +44,12 @@ func (db *database) open() error {
 }
 
 func (db *database) saveCustomers(cs []Customer) ([]Customer, error) {
-	size := len(cs) / databaseRecordsPerCycle
+	recs := databaseRecordsPerCycle
+	if len(cs) < recs {
+		recs = len(cs)
+	}
+
+	size := len(cs) / recs
 	if len(cs)%size != 0 {
 		size++
 	}
@@ -60,15 +65,15 @@ func (db *database) saveCustomers(cs []Customer) ([]Customer, error) {
 	}
 
 	for i := 0; i < size; i++ {
-		cst := cs[i*databaseRecordsPerCycle : (i+1)*databaseRecordsPerCycle]
+		cst := cs[i*recs : (i+1)*recs]
 		if i+1 == size {
-			cst = cs[i*databaseRecordsPerCycle:]
+			cst = cs[i*recs:]
 		}
 
 		jobs <- cst
 	}
 
-	csr := make([]Customer, 0, databaseRecordsPerCycle)
+	csr := make([]Customer, 0, recs)
 	for i := 0; i < size; i++ {
 		r := <-resp
 		if r.err != nil {
