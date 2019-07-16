@@ -88,7 +88,7 @@ func (db *database) worker(inCh <-chan []Customer, outCh chan<- databaseResp) {
 }
 
 func (db *database) job(cs []Customer) databaseResp {
-	log.Printf("Sending %d customers to database\n", len(cs))
+	log.Printf("DATABASE -> %d - %d\n", cs[0].ID, cs[len(cs)-1].ID)
 
 	tx, err := db.postgres.Begin()
 	if err != nil {

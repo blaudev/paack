@@ -86,7 +86,7 @@ func (in *integrator) worker(inCh <-chan []Customer, outCh chan<- integratorResp
 }
 
 func (in *integrator) job(cs []Customer) integratorResp {
-	log.Printf("Sending %d customers to integrator\n", len(cs))
+	log.Printf("INTEGRATOR -> %d - %d\n", cs[0].ID, cs[len(cs)-1].ID)
 
 	resp := &Response{}
 	if err := in.client.Call(integratorProcessFuncName, cs, resp); err != nil {
