@@ -57,8 +57,12 @@ func ParseCSV(filepath string) error {
                         return err
                 }
 
-                err = sendToCMS(cl, c)
+                resp, err := sendToCMS(cl, c)
                 if err != nil {
+                        return err
+                }
+
+                if !resp.Ok {
                         return err
                 }
         }
@@ -84,11 +88,17 @@ func saveToDatabase(db *sql.DB, c Customer) error {
         return err
 }
 
-func sendToCMS(cl *rpc.Client, c Customer) error {
+func sendToCMS(cl *rpc.Client, c Customer) (*Response, error) {
         req := &Request{
                 c,
         }
 
         resp := &Response{}
-        return cl.Call(integratorProcessFuncName, req, resp)
+
+        err := cl.Call(integratorProcessFuncName, req, resp)
+        if err != nil {
+                return nil, err
+        }
+
+        return resp, nil
 }
