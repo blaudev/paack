@@ -101,5 +101,9 @@ func main() {
                 if err != nil {
                         log.Fatalln(err)
                 }
+
+                if !resp.Ok {
+                        log.Fatalln(err)
+                }
         }
 }
